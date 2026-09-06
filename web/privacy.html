@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible Study App - Privacy Policy</title>
+  <meta name="description" content="Privacy Policy for Bible Study App by Waitaminute Digital. Learn about our offline-first architecture and commitment to user privacy.">
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1E1E1E;
+      --card-border: #2E2E2E;
+      --primary-color: #FFC107;
+      --primary-light: rgba(255, 193, 7, 0.12);
+      --text-main: #E0E0E0;
+      --text-secondary: #AAAAAA;
+      --text-muted: #777777;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      line-height: 1.65;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .header-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 32px 28px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #FFC107, #FFD54F);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-color);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 193, 7, 0.25);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+
+    .brand-meta {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .brand-meta strong {
+      color: var(--primary-color);
+    }
+
+    .content-section {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .num {
+      background: var(--primary-light);
+      color: var(--primary-color);
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    ul {
+      margin: 12px 0 12px 24px;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .highlight-box {
+      background: rgba(255, 193, 7, 0.06);
+      border-left: 3px solid var(--primary-color);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+    }
+
+    .highlight-box p {
+      color: #ECECEC;
+      font-size: 0.92rem;
+    }
+
+    a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .contact-card {
+      background: linear-gradient(135deg, #1E1E1E 0%, #252525 100%);
+      border: 1px solid var(--primary-color);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .contact-card h3 {
+      color: #FFFFFF;
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+    }
+
+    .contact-btn {
+      display: inline-block;
+      margin-top: 12px;
+      background: var(--primary-color);
+      color: #121212;
+      font-weight: 700;
+      padding: 10px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .contact-btn:hover {
+      background: #FFD54F;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 36px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 14px;
+      }
+      .header-card {
+        padding: 24px 18px;
+      }
+      .content-section {
+        padding: 20px 18px;
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header-card">
+      <div class="badge">Official Privacy Policy</div>
+      <h1>Bible Study App</h1>
+      <div class="brand-meta">
+        <span>Developer / Brand: <strong>Waitaminute Digital</strong></span>
+        <span>&bull;</span>
+        <span>Effective Date: <strong>September 2026</strong></span>
+      </div>
+    </header>
+
+    <main>
+      <section class="content-section">
+        <h2><span class="num">1</span> Overview & Commitment</h2>
+        <p>
+          At <strong>Waitaminute Digital</strong>, we respect and value your privacy. This Privacy Policy describes how the <strong>Bible Study App</strong> operates and ensures that your personal information, study habits, and reflections remain strictly confidential and under your control.
+        </p>
+        <div class="highlight-box">
+          <p>
+            <strong>Summary:</strong> The Bible Study App is designed as an offline-first application. We do not require accounts, do not track your reading, and do not sell or transmit your personal data.
+          </p>
+        </div>
+      </section>
+
+      <section class="content-section">
+        <h2><span class="num">2</span> Offline-First Architecture & Local Storage</h2>
+        <p>
+          The application is built on an offline-first foundation to guarantee continuous accessibility and privacy:
+        </p>
+        <ul>
+          <li><strong>Scripture Text:</strong> The full biblical text and canonical references are packaged directly within the local application assets. No network connection is needed to browse, read, or search the scriptures.</li>
+          <li><strong>User Study Notes:</strong> All user-authored notes, parsed references, and personal reflections are saved directly onto your device using encrypted, sandboxed local storage (SharedPreferences).</li>
+          <li><strong>Verse Highlights & Bookmarks:</strong> Custom color highlights and saved bookmarks reside exclusively on your physical device.</li>
+          <li><strong>Study Questions & Answers:</strong> All answers and reflections entered in the study questions module are persisted locally on your device.</li>
+        </ul>
+        <p>
+          Because all data is stored locally, your notes and highlights are never synced to any cloud server operated by us, nor are they accessible to us.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h2><span class="num">3</span> Data Collection & Analytics</h2>
+        <p>
+          We uphold a strict zero-data-collection philosophy:
+        </p>
+        <ul>
+          <li><strong>No Personal Information:</strong> We do not collect names, email addresses, phone numbers, location data, or contact lists.</li>
+          <li><strong>No Third-Party Data Sharing:</strong> We do not sell, rent, trade, or share your data with advertisers, data brokers, or third-party marketing entities.</li>
+          <li><strong>No User Account Requirement:</strong> You are never required to log in or create an account to experience all features of the Bible Study App.</li>
+        </ul>
+      </section>
+
+      <section class="content-section">
+        <h2><span class="num">4</span> Advertising, Telemetry & Platform Compliance</h2>
+        <p>
+          The Bible Study App complies with all <strong>Google Play Developer Program Policies</strong>, including the Google Play Families and Advertising ID policies:
+        </p>
+        <ul>
+          <li>Standard underlying platform libraries and runtime components operate in adherence with Google Play Developer Policies and applicable platform advertising identifiers.</li>
+          <li>The app does not link your device advertising ID with any personally identifiable information (PII) or personal study activity.</li>
+          <li>Any diagnostic crash reporting that may occur via standard Google Play Services is managed in accordance with Google's Play Console Developer Terms.</li>
+        </ul>
+      </section>
+
+      <section class="content-section">
+        <h2><span class="num">5</span> Sharing & Exporting Content</h2>
+        <p>
+          When you choose to use the "Share to Chat", "Export PDF", or "Copy Lesson" features, the app uses standard platform sharing sheets (such as Android Intent or iOS UIActivityViewController). Your device controls which third-party application receives the exported lesson or text snippet based solely on your explicit selection.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h2><span class="num">6</span> Children's Privacy</h2>
+        <p>
+          The Bible Study App is safe for audiences of all ages and does not knowingly collect or solicit any personal information from children under the age of 13.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h2><span class="num">7</span> Changes to This Privacy Policy</h2>
+        <p>
+          We may periodically update this policy to reflect application enhancements or regulatory changes. Any revisions will be published on this page with an updated effective date.
+        </p>
+      </section>
+
+      <div class="contact-card">
+        <h3>Questions or Inquiries?</h3>
+        <p>
+          If you have questions regarding this Privacy Policy or the security of your data, please contact Waitaminute Digital directly:
+        </p>
+        <a href="mailto:support@waitaminutedigital.com" class="contact-btn">support@waitaminutedigital.com</a>
+      </div>
+    </main>
+
+    <footer>
+      &copy; 2026 Waitaminute Digital. All rights reserved. &bull; Bible Study App
+    </footer>
+  </div>
+</body>
+</html>
