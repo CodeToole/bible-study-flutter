@@ -1,4 +1,4 @@
-package com.example.bible_study_app
+package com.waitaminutedigital.biblestudyapp
 
 import io.flutter.embedding.android.FlutterActivity
 
