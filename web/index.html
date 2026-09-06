@@ -31,6 +31,34 @@
 
   <title>bible_study_app</title>
   <link rel="manifest" href="manifest.json">
+
+  <!-- Microsoft Clarity (Project: ydutvrsp6f) -->
+  <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ydutvrsp6f");
+  </script>
+
+  <!-- Firebase App & Analytics SDK (Web) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-analytics.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdkSdRxHq0WLhLXrwaEIQxlEhf-xZ38JE",
+      authDomain: "bible-study-app-2ceed.firebaseapp.com",
+      projectId: "bible-study-app-2ceed",
+      storageBucket: "bible-study-app-2ceed.firebasestorage.app",
+      messagingSenderId: "846957169521",
+      appId: "1:846957169521:web:14a33b59d446c8782784d0",
+      measurementId: "G-2VJ9REM0QD"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 </head>
 <body>
   <!--
