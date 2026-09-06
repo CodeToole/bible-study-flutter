@@ -44,6 +44,8 @@ build/
 *.keystore
 *.key
 *.p12
+key.properties
+**/key.properties
 
 # Symbolication related
 app.*.symbols
