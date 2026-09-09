@@ -2,7 +2,7 @@ name: bible_study_app
 description: "Universal Bible Study App with Red-Letter text and persistent offline study tools."
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ^3.13.2
