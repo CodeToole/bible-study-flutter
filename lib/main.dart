@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'clarity_bootstrap.dart'
+    if (dart.library.js_interop) 'clarity_bootstrap_web.dart';
 import 'models/verse.dart';
 import 'services/bible_service.dart';
 import 'services/storage_service.dart';
@@ -7,7 +9,7 @@ import 'screens/study_notes_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const BibleStudyApp());
+  runApp(buildAppWithClarity(const BibleStudyApp()));
 }
 
 class BibleStudyApp extends StatelessWidget {

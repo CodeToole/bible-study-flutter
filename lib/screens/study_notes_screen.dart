@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/verse.dart';
 import '../models/study_note.dart';
 import '../models/lesson_plan.dart';
@@ -7,6 +8,7 @@ import '../services/bible_service.dart';
 import '../services/scripture_parser.dart';
 import '../services/lesson_parser.dart';
 import '../services/export_service.dart';
+import '../services/ocr_service.dart';
 import '../widgets/verse_text.dart';
 import 'podium_screen.dart';
 
@@ -31,6 +33,10 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
   late TabController _tabController;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+
+  // OCR on-device handwriting scanner
+  final OcrService _ocrService = OcrService();
+  bool _isScanningOcr = false;
 
   // Parsed references preview state
   List<ParsedScriptureRef> _parsedReferences = [];
@@ -68,6 +74,7 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
 
   @override
   void dispose() {
+    _ocrService.dispose();
     _tabController.dispose();
     _titleController.dispose();
     _contentController.dispose();
@@ -236,6 +243,297 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
     );
   }
 
+  Future<void> _showScanNoteSourceSheet() async {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E1E1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        side: BorderSide(color: Color(0xFF2E2E2E)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFC107).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.document_scanner, color: Color(0xFFFFC107), size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Scan Handwritten Notes',
+                          style: TextStyle(
+                            color: Color(0xFFE0E0E0),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'Select capture source for on-device OCR',
+                          style: TextStyle(color: Colors.white54, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2A2A2A),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.camera_alt_rounded, color: Color(0xFFFFC107), size: 20),
+                  ),
+                  title: const Text(
+                    'Take Photo (Camera)',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    'Capture lesson outlines directly from notebook or paper',
+                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  tileColor: const Color(0xFF181818),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _performOcrScan(ImageSource.camera);
+                  },
+                ),
+                const SizedBox(height: 10),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2A2A2A),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.photo_library_rounded, color: Color(0xFFFFC107), size: 20),
+                  ),
+                  title: const Text(
+                    'Upload Image (Gallery)',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    'Select existing photo from device photo library',
+                    style: TextStyle(color: Colors.white54, fontSize: 12),
+                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  tileColor: const Color(0xFF181818),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _performOcrScan(ImageSource.gallery);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _performOcrScan(ImageSource source) async {
+    setState(() => _isScanningOcr = true);
+
+    try {
+      final scanned = await _ocrService.scanNote(source: source);
+      if (!mounted) return;
+      setState(() => _isScanningOcr = false);
+
+      if (scanned == null) {
+        // User cancelled picker
+        return;
+      }
+
+      if (scanned.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No legible text recognized. Please try with clearer lighting or higher contrast.'),
+            backgroundColor: Color(0xFF2A2A2A),
+          ),
+        );
+        return;
+      }
+
+      _showReviewScannedNotesSheet(scanned);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isScanningOcr = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error scanning notes: $e'),
+          backgroundColor: Colors.red.shade900,
+        ),
+      );
+    }
+  }
+
+  void _showReviewScannedNotesSheet(String initialText) {
+    final reviewController = TextEditingController(text: initialText);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF1E1E1E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        side: BorderSide(color: Color(0xFF2E2E2E)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(ctx).size.height * 0.85,
+            ),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFC107).withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(Icons.fact_check_rounded, color: Color(0xFFFFC107), size: 20),
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Review & Adjust Scanned Notes',
+                            style: TextStyle(
+                              color: Color(0xFFE0E0E0),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            'Make corrections, adjust scribbles, or add citations',
+                            style: TextStyle(color: Colors.white54, fontSize: 11.5),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white60, size: 20),
+                      onPressed: () => Navigator.of(ctx).pop(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Expanded(
+                  child: TextField(
+                    controller: reviewController,
+                    maxLines: null,
+                    expands: true,
+                    style: const TextStyle(
+                      color: Color(0xFFE0E0E0),
+                      fontSize: 14.5,
+                      height: 1.5,
+                      fontFamily: 'monospace',
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color(0xFF141414),
+                      hintText: 'Scanned note content...',
+                      hintStyle: const TextStyle(color: Colors.white30),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(color: Color(0xFFFFC107)),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  icon: const Icon(Icons.input_rounded, color: Colors.black, size: 20),
+                  label: const Text(
+                    'Import into Lesson Composer',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFC107),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () {
+                    final finalContent = reviewController.text.trim();
+                    Navigator.of(ctx).pop();
+
+                    if (finalContent.isNotEmpty) {
+                      setState(() {
+                        if (_contentController.text.trim().isEmpty) {
+                          _contentController.text = finalContent;
+                        } else {
+                          _contentController.text = '${_contentController.text.trim()}\n\n$finalContent';
+                        }
+                        if (_titleController.text.trim().isEmpty) {
+                          final match = RegExp(r'^Title:\s*(.+)$', multiLine: true, caseSensitive: false)
+                              .firstMatch(finalContent);
+                          if (match != null) {
+                            _titleController.text = match.group(1)?.trim() ?? 'Handwritten Lesson Notes';
+                          } else {
+                            _titleController.text = 'Handwritten Lesson Notes';
+                          }
+                        }
+                      });
+
+                      _parseScriptures();
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Handwritten notes imported into composer & parsed!'),
+                          backgroundColor: Color(0xFF1E1E1E),
+                          duration: Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _saveCurrentNote() async {
     final content = _contentController.text.trim();
     if (content.isEmpty) {
@@ -350,9 +648,12 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Quick Action: Insert Lesson Template
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Quick Action: Scan Handwritten Notes & Insert Lesson Template
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               const Text(
                 'LESSON COMPOSER',
@@ -363,25 +664,56 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                   letterSpacing: 1,
                 ),
               ),
-              TextButton.icon(
-                icon: const Icon(Icons.auto_stories, color: Color(0xFFFFC107), size: 16),
-                label: const Text(
-                  'Insert Lesson Template',
-                  style: TextStyle(
-                    color: Color(0xFFFFC107),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12.5,
+              Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  OutlinedButton.icon(
+                    icon: _isScanningOcr
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFC107)),
+                          )
+                        : const Icon(Icons.document_scanner_outlined, color: Color(0xFFFFC107), size: 16),
+                    label: Text(
+                      _isScanningOcr ? 'Scanning...' : 'Scan Handwritten Notes',
+                      style: const TextStyle(
+                        color: Color(0xFFFFC107),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      side: BorderSide(color: const Color(0xFFFFC107).withValues(alpha: 0.4)),
+                      backgroundColor: const Color(0xFFFFC107).withValues(alpha: 0.08),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: _isScanningOcr ? null : _showScanNoteSourceSheet,
                   ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  backgroundColor: const Color(0xFFFFC107).withValues(alpha: 0.1),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(color: const Color(0xFFFFC107).withValues(alpha: 0.3)),
+                  TextButton.icon(
+                    icon: const Icon(Icons.auto_stories, color: Color(0xFFFFC107), size: 16),
+                    label: const Text(
+                      'Insert Template',
+                      style: TextStyle(
+                        color: Color(0xFFFFC107),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      backgroundColor: const Color(0xFFFFC107).withValues(alpha: 0.1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: const Color(0xFFFFC107).withValues(alpha: 0.3)),
+                      ),
+                    ),
+                    onPressed: _insertLessonTemplate,
                   ),
-                ),
-                onPressed: _insertLessonTemplate,
+                ],
               ),
             ],
           ),
