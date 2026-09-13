@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/verse.dart';
 import '../models/study_note.dart';
@@ -244,6 +245,19 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
   }
 
   Future<void> _showScanNoteSourceSheet() async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Handwritten OCR scanning is an on-device feature available on the Android app.',
+          ),
+          backgroundColor: Color(0xFF1E1E1E),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1E1E1E),

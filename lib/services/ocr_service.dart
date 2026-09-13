@@ -7,21 +7,28 @@ import 'package:image_picker/image_picker.dart';
 /// clean, normalized Scripture outlines using on-device ML Kit text recognition.
 class OcrService {
   final ImagePicker _picker;
-  final TextRecognizer _recognizer;
+  final TextRecognizer? _recognizer;
   bool _isDisposed = false;
 
   OcrService({
     ImagePicker? picker,
     TextRecognizer? recognizer,
   })  : _picker = picker ?? ImagePicker(),
-        _recognizer = recognizer ?? TextRecognizer(script: TextRecognitionScript.latin);
+        _recognizer = recognizer ??
+            (kIsWeb
+                ? null
+                : TextRecognizer(script: TextRecognitionScript.latin));
 
   /// Picks an image from [source] with quality 90 and processes it with ML Kit.
   /// Returns the sanitized, normalized note text, or null if cancelled.
   Future<String?> scanNote({required ImageSource source}) async {
+    if (kIsWeb) return null;
+
     if (_isDisposed) {
       throw StateError('Cannot scan with a disposed OcrService.');
     }
+
+    if (_recognizer == null) return null;
 
     try {
       final XFile? image = await _picker.pickImage(
@@ -172,6 +179,8 @@ class OcrService {
   /// Cleans up resources.
   Future<void> dispose() async {
     _isDisposed = true;
-    await _recognizer.close();
+    if (_recognizer != null) {
+      await _recognizer.close();
+    }
   }
 }
