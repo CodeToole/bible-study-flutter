@@ -10,19 +10,25 @@ class OcrService {
   final TextRecognizer? _recognizer;
   bool _isDisposed = false;
 
+  /// Whether the current platform supports ML Kit OCR (Android and iOS).
+  static bool get isSupportedMobilePlatform =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
+
   OcrService({
     ImagePicker? picker,
     TextRecognizer? recognizer,
   })  : _picker = picker ?? ImagePicker(),
         _recognizer = recognizer ??
-            (kIsWeb
-                ? null
-                : TextRecognizer(script: TextRecognitionScript.latin));
+            (isSupportedMobilePlatform
+                ? TextRecognizer(script: TextRecognitionScript.latin)
+                : null);
 
   /// Picks an image from [source] with quality 90 and processes it with ML Kit.
   /// Returns the sanitized, normalized note text, or null if cancelled.
   Future<String?> scanNote({required ImageSource source}) async {
-    if (kIsWeb) return null;
+    if (!isSupportedMobilePlatform) return null;
 
     if (_isDisposed) {
       throw StateError('Cannot scan with a disposed OcrService.');
