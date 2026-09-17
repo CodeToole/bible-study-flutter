@@ -385,11 +385,12 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
 
       _showReviewScannedNotesSheet(scanned);
     } catch (e) {
+      debugPrint('Error scanning notes: $e');
       if (!mounted) return;
       setState(() => _isScanningOcr = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error scanning notes: $e'),
+          content: const Text('Failed to process image. Please try again with a clearer photo.'),
           backgroundColor: Colors.red.shade900,
         ),
       );

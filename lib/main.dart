@@ -92,8 +92,9 @@ class _AppRootContainerState extends State<AppRootContainer> {
       await BibleService.instance.load();
       setState(() => _isLoading = false);
     } catch (e) {
+      debugPrint('Error initializing services: $e');
       setState(() {
-        _loadingMessage = 'Error loading dataset: $e';
+        _loadingMessage = 'An error occurred while initializing application data.';
       });
     }
   }
