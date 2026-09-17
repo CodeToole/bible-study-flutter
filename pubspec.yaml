@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.4+5
 
 environment:
-  sdk: ^3.13.2
+  sdk: ^3.11.0
 
 dependencies:
   flutter:
@@ -16,8 +16,8 @@ dependencies:
   # High-performance local storage for persistent highlights, notes, history & questions
   shared_preferences: ^2.3.2
   share_plus: ^13.3.0
-  pdf: ^3.13.0
-  printing: ^5.15.0
+  pdf: ^3.10.0
+  printing: ^5.13.0
 
   # Telemetry & Handwritten Notes OCR Scanning
   clarity_flutter: ^1.9.0
