@@ -60,8 +60,10 @@ void main() {
       await BibleService.instance.load();
     });
 
-    test('Parses multi-reference citations without stripping numbered book prefixes', () {
-      const sampleText = '''
+    test(
+      'Parses multi-reference citations without stripping numbered book prefixes',
+      () {
+        const sampleText = '''
 Here are the study passages for tonight:
 1. EXODUS 20:1-17 (Ten Commandments)
 2. 1 KINGS 8:27-30 (Solomon's temple prayer)
@@ -70,40 +72,50 @@ Here are the study passages for tonight:
 5. John 3:16
 ''';
 
-      final results = ScriptureParser.parse(sampleText);
+        final results = ScriptureParser.parse(sampleText);
 
-      expect(results.length, 5);
+        expect(results.length, 5);
 
-      expect(results[0].book.name, 'Exodus');
-      expect(results[0].chapter, 20);
-      expect(results[0].startVerse, 1);
-      expect(results[0].endVerse, 17);
-      expect(results[0].referenceLabel, 'Exodus 20:1-17');
-      expect(results[0].verses.length, 17);
+        expect(results[0].book.name, 'Exodus');
+        expect(results[0].chapter, 20);
+        expect(results[0].startVerse, 1);
+        expect(results[0].endVerse, 17);
+        expect(results[0].referenceLabel, 'Exodus 20:1-17');
+        expect(results[0].verses.length, 17);
 
-      expect(results[1].book.name, '1 Kings');
-      expect(results[1].chapter, 8);
-      expect(results[1].startVerse, 27);
-      expect(results[1].endVerse, 30);
-      expect(results[1].referenceLabel, '1 Kings 8:27-30');
-      expect(results[1].verses.length, 4);
+        expect(results[1].book.name, '1 Kings');
+        expect(results[1].chapter, 8);
+        expect(results[1].startVerse, 27);
+        expect(results[1].endVerse, 30);
+        expect(results[1].referenceLabel, '1 Kings 8:27-30');
+        expect(results[1].verses.length, 4);
 
-      expect(results[2].book.name, '1 John');
-      expect(results[2].chapter, 1);
-      expect(results[2].startVerse, 9);
-      expect(results[2].referenceLabel, '1 John 1:9');
-      expect(results[2].verses.length, 1);
+        expect(results[2].book.name, '1 John');
+        expect(results[2].chapter, 1);
+        expect(results[2].startVerse, 9);
+        expect(results[2].referenceLabel, '1 John 1:9');
+        expect(results[2].verses.length, 1);
 
-      expect(results[3].book.name, 'Song of Solomon');
-      expect(results[3].chapter, 2);
-      expect(results[3].startVerse, 1);
-      expect(results[3].referenceLabel, 'Song of Solomon 2:1');
+        expect(results[3].book.name, 'Song of Solomon');
+        expect(results[3].chapter, 2);
+        expect(results[3].startVerse, 1);
+        expect(results[3].referenceLabel, 'Song of Solomon 2:1');
 
-      expect(results[4].book.name, 'John');
-      expect(results[4].chapter, 3);
-      expect(results[4].startVerse, 16);
-      expect(results[4].referenceLabel, 'John 3:16');
-      expect(results[4].verses.first.hasRedLetters, isTrue);
+        expect(results[4].book.name, 'John');
+        expect(results[4].chapter, 3);
+        expect(results[4].startVerse, 16);
+        expect(results[4].referenceLabel, 'John 3:16');
+        expect(results[4].verses.first.hasRedLetters, isTrue);
+      },
+    );
+
+    test('Resistant to ReDoS with crafted inputs', () {
+      final evilInput = 'Song ' + ('of ' * 1000) + 'Solomon 2:1';
+      final stopwatch = Stopwatch()..start();
+      final results = ScriptureParser.parse(evilInput);
+      stopwatch.stop();
+
+      expect(stopwatch.elapsedMilliseconds, lessThan(1000));
     });
 
     test('Searches scripture verses by keyword across the dataset', () {

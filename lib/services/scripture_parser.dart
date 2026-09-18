@@ -34,7 +34,7 @@ class ScriptureParser {
   // Regex supporting numbered prefixes (1-3), book names (including "Song of Solomon"),
   // chapter, verse, and optional end verse range.
   static final RegExp _citationRegex = RegExp(
-    r'\b((?:[1-3]\s+)?[A-Za-z]+(?:\s+of\s+[A-Za-z]+)?)\s+(\d+)[:\.](\d+)(?:\s*[-–—]\s*(\d+))?',
+    r'\b((?:[1-3]\s+)?[A-Za-z]+(?:\s+of\s+(?:Solomon|Songs))?)\s+(\d+)[:\.](\d+)(?:\s*[-–—]\s*(\d+))?',
     caseSensitive: false,
   );
 
@@ -120,11 +120,17 @@ class ScriptureParser {
       if (book == null) continue;
 
       // Avoid exact duplicate references in same parse
-      final dedupeKey = '${book.id}:$chapter:$startVerse:${endVerse ?? startVerse}';
+      final dedupeKey =
+          '${book.id}:$chapter:$startVerse:${endVerse ?? startVerse}';
       if (processedKeys.contains(dedupeKey)) continue;
       processedKeys.add(dedupeKey);
 
-      final verses = bible.getVerseRange(book.id, chapter, startVerse, endVerse);
+      final verses = bible.getVerseRange(
+        book.id,
+        chapter,
+        startVerse,
+        endVerse,
+      );
 
       results.add(
         ParsedScriptureRef(
@@ -151,14 +157,17 @@ class ScriptureParser {
     if (book != null) return book;
 
     // Check aliases
-    final canonicalName = _aliases[lower] ?? _aliases[lower.replaceAll(' ', '')];
+    final canonicalName =
+        _aliases[lower] ?? _aliases[lower.replaceAll(' ', '')];
     if (canonicalName != null) {
       book = bible.findBookByName(canonicalName);
       if (book != null) return book;
     }
 
     // Numbered books handling (e.g. "1st Kings" -> "1 Kings", "1Kings" -> "1 Kings")
-    final numberedMatch = RegExp(r'^([1-3])(?:st|nd|rd)?\s*([a-zA-Z]+)').firstMatch(lower);
+    final numberedMatch = RegExp(
+      r'^([1-3])(?:st|nd|rd)?\s*([a-zA-Z]+)',
+    ).firstMatch(lower);
     if (numberedMatch != null) {
       final numPrefix = numberedMatch.group(1);
       final rest = numberedMatch.group(2);
