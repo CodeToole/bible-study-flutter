@@ -110,11 +110,12 @@ Here are the study passages for tonight:
     );
 
     test('Resistant to ReDoS with crafted inputs', () {
-      final evilInput = 'Song ' + ('of ' * 1000) + 'Solomon 2:1';
+      final evilInput = 'Song ${'of ' * 1000}Solomon 2:1';
       final stopwatch = Stopwatch()..start();
       final results = ScriptureParser.parse(evilInput);
       stopwatch.stop();
 
+      expect(results, isNotNull);
       expect(stopwatch.elapsedMilliseconds, lessThan(1000));
     });
 
