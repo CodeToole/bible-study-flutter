@@ -135,6 +135,36 @@ class BibleService {
     return verses.where((v) => v.verse >= startVerse && v.verse <= targetEnd).toList();
   }
 
+  /// Look up each requested verse number in [book] and [chapter],
+  /// returning only the matching verses in the specified order.
+  List<Verse> getSpecificVerses(String book, int chapter, List<int> verseNumbers) {
+    if (verseNumbers.isEmpty) return const [];
+
+    BookInfo? bookInfo;
+    final int? bookId = int.tryParse(book);
+    if (bookId != null) {
+      bookInfo = getBook(bookId);
+    }
+    bookInfo ??= findBookByName(book);
+    if (bookInfo == null) return const [];
+
+    final verses = getVerses(bookInfo.id, chapter);
+    if (verses.isEmpty) return const [];
+
+    final Map<int, Verse> verseMap = {
+      for (final v in verses) v.verse: v,
+    };
+
+    final List<Verse> result = [];
+    for (final vNum in verseNumbers) {
+      final match = verseMap[vNum];
+      if (match != null) {
+        result.add(match);
+      }
+    }
+    return result;
+  }
+
   /// Lookup a verse by reference coordinates
   Verse? getVerse(int bookId, int chapter, int verseNum) {
     final verses = getVerses(bookId, chapter);

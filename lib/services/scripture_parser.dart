@@ -7,36 +7,104 @@ class ParsedScriptureRef {
   final String rawMatch;
   final BookInfo book;
   final int chapter;
-  final int startVerse;
-  final int? endVerse;
+  final List<int> verseNumbers;
   final List<Verse> verses;
+  final String? verseSpec;
+  final int? _startVerse;
+  final int? _endVerse;
 
-  const ParsedScriptureRef({
+  ParsedScriptureRef({
     required this.rawMatch,
     required this.book,
     required this.chapter,
-    required this.startVerse,
-    this.endVerse,
+    required this.verseNumbers,
+    int? startVerse,
+    int? endVerse,
     required this.verses,
-  });
+    this.verseSpec,
+  })  : _startVerse = startVerse,
+        _endVerse = endVerse;
+
+  int get startVerse =>
+      _startVerse ?? (verseNumbers.isNotEmpty ? verseNumbers.first : 1);
+
+  int? get endVerse =>
+      _endVerse ?? (verseNumbers.length > 1 ? verseNumbers.last : null);
 
   String get referenceLabel {
+    if (verseSpec != null && verseSpec!.isNotEmpty) {
+      return '${book.name} $chapter:$verseSpec';
+    }
+    if (verseNumbers.isEmpty) {
+      return '${book.name} $chapter:$startVerse';
+    }
+    if (verseNumbers.length == 1) {
+      return '${book.name} $chapter:${verseNumbers.first}';
+    }
     if (endVerse != null && endVerse != startVerse) {
       return '${book.name} $chapter:$startVerse-$endVerse';
     }
-    return '${book.name} $chapter:$startVerse';
+    return '${book.name} $chapter:${verseNumbers.join(",")}';
   }
 }
+
+/// Type alias for backward and naming compatibility
+typedef ParsedScriptureReference = ParsedScriptureRef;
 
 /// Multi-reference regex engine that extracts multiple Bible references and ranges
 /// without stripping numbered book prefixes (e.g. 1 Kings, 2 Samuel, 1 Peter).
 class ScriptureParser {
   // Regex supporting numbered prefixes (1-3), book names (including "Song of Solomon"),
-  // chapter, verse, and optional end verse range.
+  // chapter, and comma-separated verses and mixed sub-ranges.
+  // e.g. "Hebrews 10:1,4,5,6,7", "Revelation 19:11,12,13", "John 1:3, 10-14", "Jeremiah 23:1-2, 14, 16-17, 21-22".
   static final RegExp _citationRegex = RegExp(
-    r'\b((?:[1-3]\s+)?[A-Za-z]+(?:\s+of\s+(?:Solomon|Songs))?)\s+(\d+)[:\.](\d+)(?:\s*[-–—]\s*(\d+))?',
+    r'\b((?:[1-3]\s+)?[A-Za-z]+(?:\s+of\s+(?:Solomon|Songs))?)\s+(\d+)[:\.](\d+(?:\s*[-–—]\s*\d+)?(?:\s*,\s*\d+(?:\s*[-–—]\s*\d+)?)*)',
     caseSensitive: false,
   );
+
+  /// Parses a verse specification string into an ordered, deduplicated list of verse numbers.
+  /// Handles individual numbers ("1,4,5"), sub-ranges ("10-14", "1-2"), and space-tolerant formatting ("1, 2").
+  static List<int> parseVerseNumbers(String verseSpec) {
+    final segments = verseSpec.split(',');
+    final List<int> expanded = [];
+
+    for (final segment in segments) {
+      final trimmed = segment.trim();
+      if (trimmed.isEmpty) continue;
+
+      final rangeMatch = RegExp(r'^(\d+)\s*[-–—]\s*(\d+)$').firstMatch(trimmed);
+      if (rangeMatch != null) {
+        final start = int.tryParse(rangeMatch.group(1)!);
+        final end = int.tryParse(rangeMatch.group(2)!);
+        if (start != null && end != null) {
+          if (start <= end) {
+            for (int i = start; i <= end; i++) {
+              expanded.add(i);
+            }
+          } else {
+            for (int i = start; i >= end; i--) {
+              expanded.add(i);
+            }
+          }
+        }
+      } else {
+        final single = int.tryParse(trimmed);
+        if (single != null) {
+          expanded.add(single);
+        }
+      }
+    }
+
+    // Deduplicate and preserve the specified order of verse numbers
+    final Set<int> seen = {};
+    final List<int> ordered = [];
+    for (final v in expanded) {
+      if (seen.add(v)) {
+        ordered.add(v);
+      }
+    }
+    return ordered;
+  }
 
   // Common aliases and abbreviations mapped to canonical book names
   static final Map<String, String> _aliases = {
@@ -109,27 +177,27 @@ class ScriptureParser {
     for (final match in matches) {
       final rawBook = (match.group(1) ?? '').trim();
       final chapterStr = match.group(2) ?? '1';
-      final startVerseStr = match.group(3) ?? '1';
-      final endVerseStr = match.group(4);
+      final rawVerseSpec = match.group(3) ?? '1';
 
       final chapter = int.tryParse(chapterStr) ?? 1;
-      final startVerse = int.tryParse(startVerseStr) ?? 1;
-      final endVerse = endVerseStr != null ? int.tryParse(endVerseStr) : null;
+      final verseNumbers = parseVerseNumbers(rawVerseSpec);
+      if (verseNumbers.isEmpty) continue;
+
+      final startVerse = verseNumbers.first;
+      final endVerse = verseNumbers.length > 1 ? verseNumbers.last : null;
 
       final book = _resolveBook(rawBook, bible);
       if (book == null) continue;
 
       // Avoid exact duplicate references in same parse
-      final dedupeKey =
-          '${book.id}:$chapter:$startVerse:${endVerse ?? startVerse}';
+      final dedupeKey = '${book.id}:$chapter:${verseNumbers.join(",")}';
       if (processedKeys.contains(dedupeKey)) continue;
       processedKeys.add(dedupeKey);
 
-      final verses = bible.getVerseRange(
-        book.id,
+      final verses = bible.getSpecificVerses(
+        book.name,
         chapter,
-        startVerse,
-        endVerse,
+        verseNumbers,
       );
 
       results.add(
@@ -137,8 +205,10 @@ class ScriptureParser {
           rawMatch: match.group(0) ?? '',
           book: book,
           chapter: chapter,
+          verseNumbers: verseNumbers,
           startVerse: startVerse,
           endVerse: endVerse,
+          verseSpec: rawVerseSpec.trim(),
           verses: verses,
         ),
       );

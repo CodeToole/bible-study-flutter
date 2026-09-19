@@ -215,6 +215,8 @@ class LessonParser {
             .replaceFirst(RegExp(r'^(?:point\s+)?\d+[\.\)\:]\s*', caseSensitive: false), '')
             .replaceAll(primaryRef.rawMatch, '')
             .replaceAll(RegExp(r'[\(\)]'), '')
+            .replaceFirst(RegExp(r'^[\s,;:\-–—]+'), '')
+            .replaceFirst(RegExp(r'[\s,;:\-–—]+$'), '')
             .trim();
         if (cleanCitationText.isNotEmpty && !lineDefs.keys.any((k) => cleanCitationText.contains(k))) {
           currentNotes.add(cleanCitationText);
@@ -235,6 +237,14 @@ class LessonParser {
         // 2. Teacher talking points / bullets
         if (isBullet) {
           final note = trimmed.replaceFirst(RegExp(r'^[-•*–]\s*'), '').trim();
+          final bracketMatch = RegExp(r'^\[(\d+)\]').firstMatch(note);
+          if (bracketMatch != null) {
+            final verseNum = int.tryParse(bracketMatch.group(1)!);
+            if (verseNum != null && currentVerses.any((v) => v.verse == verseNum)) {
+              // Verse is already being fetched by citation card, do not duplicate into talking points
+              continue;
+            }
+          }
           if (note.isNotEmpty) {
             currentNotes.add(note);
           }
@@ -242,6 +252,15 @@ class LessonParser {
         }
 
         // 3. Regular non-empty commentary line within this point
+        final bracketMatch = RegExp(r'^\[(\d+)\]').firstMatch(trimmed);
+        if (bracketMatch != null) {
+          final verseNum = int.tryParse(bracketMatch.group(1)!);
+          if (verseNum != null && currentVerses.any((v) => v.verse == verseNum)) {
+            // Verse is already being fetched by citation card, do not duplicate into talking points
+            continue;
+          }
+        }
+
         currentNotes.add(trimmed);
         continue;
       }
