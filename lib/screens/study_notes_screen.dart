@@ -43,6 +43,10 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
   bool _hasParsed = false;
   bool _isSaving = false;
 
+  // Tracks the id of the saved note currently being edited, if any.
+  String? _editingNoteId;
+  String? _editingNoteTitle;
+
   @override
   void initState() {
     super.initState();
@@ -55,7 +59,8 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
 
   void _applyPreloadedVerses(List<Verse> verses) {
     final first = verses.first;
-    final sorted = List<Verse>.from(verses)..sort((a, b) => a.verse.compareTo(b.verse));
+    final sorted = List<Verse>.from(verses)
+      ..sort((a, b) => a.verse.compareTo(b.verse));
     final startVerse = sorted.first.verse;
     final endVerse = sorted.last.verse;
     final ref = startVerse == endVerse
@@ -93,7 +98,9 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
     if (parsed.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('No scripture citations detected in text. Try e.g. "EXODUS 20:1-17" or "1 KINGS 8:27-30".'),
+          content: Text(
+            'No scripture citations detected in text. Try e.g. "EXODUS 20:1-17" or "1 KINGS 8:27-30".',
+          ),
           duration: Duration(seconds: 3),
           backgroundColor: Color(0xFF2A2A2A),
         ),
@@ -147,7 +154,8 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
     final title = _getActiveTitle();
     final text = _contentController.text.trim();
     final parsed = LessonParser.parseLessonOutline(text, BibleService.instance);
-    if (parsed.title == 'Untitled Lesson' || parsed.title == 'Bible Study Lesson') {
+    if (parsed.title == 'Untitled Lesson' ||
+        parsed.title == 'Bible Study Lesson') {
       return LessonPlan(
         id: parsed.id,
         title: title,
@@ -168,7 +176,9 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
     if (lesson.totalPointsCount == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please parse at least one scripture reference first to launch Podium Mode.'),
+          content: Text(
+            'Please parse at least one scripture reference first to launch Podium Mode.',
+          ),
           backgroundColor: Color(0xFF2A2A2A),
         ),
       );
@@ -180,7 +190,9 @@ class StudyNotesScreenState extends State<StudyNotesScreen>
           lessonPlan: lesson,
           onLessonPlanUpdated: (updatedPlan) {
             setState(() {
-              _contentController.text = LessonParser.serializeToMarkdown(updatedPlan);
+              _contentController.text = LessonParser.serializeToMarkdown(
+                updatedPlan,
+              );
               _parseScriptures();
             });
           },
@@ -280,7 +292,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         color: const Color(0xFFFFC107).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Icon(Icons.document_scanner, color: Color(0xFFFFC107), size: 22),
+                      child: const Icon(
+                        Icons.document_scanner,
+                        color: Color(0xFFFFC107),
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     const Column(
@@ -310,17 +326,27 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                       color: const Color(0xFF2A2A2A),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.camera_alt_rounded, color: Color(0xFFFFC107), size: 20),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: Color(0xFFFFC107),
+                      size: 20,
+                    ),
                   ),
                   title: const Text(
                     'Take Photo (Camera)',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                   subtitle: const Text(
                     'Capture lesson outlines directly from notebook or paper',
                     style: TextStyle(color: Colors.white54, fontSize: 12),
                   ),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   tileColor: const Color(0xFF181818),
                   onTap: () {
                     Navigator.of(ctx).pop();
@@ -335,17 +361,27 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                       color: const Color(0xFF2A2A2A),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.photo_library_rounded, color: Color(0xFFFFC107), size: 20),
+                    child: const Icon(
+                      Icons.photo_library_rounded,
+                      color: Color(0xFFFFC107),
+                      size: 20,
+                    ),
                   ),
                   title: const Text(
                     'Upload Image (Gallery)',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                   subtitle: const Text(
                     'Select existing photo from device photo library',
                     style: TextStyle(color: Colors.white54, fontSize: 12),
                   ),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   tileColor: const Color(0xFF181818),
                   onTap: () {
                     Navigator.of(ctx).pop();
@@ -376,7 +412,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
       if (scanned.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No legible text recognized. Please try with clearer lighting or higher contrast.'),
+            content: Text(
+              'No legible text recognized. Please try with clearer lighting or higher contrast.',
+            ),
             backgroundColor: Color(0xFF2A2A2A),
           ),
         );
@@ -390,7 +428,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
       setState(() => _isScanningOcr = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Failed to process image. Please try again with a clearer photo.'),
+          content: const Text(
+            'Failed to process image. Please try again with a clearer photo.',
+          ),
           backgroundColor: Colors.red.shade900,
         ),
       );
@@ -430,7 +470,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         color: const Color(0xFFFFC107).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Icon(Icons.fact_check_rounded, color: Color(0xFFFFC107), size: 20),
+                      child: const Icon(
+                        Icons.fact_check_rounded,
+                        color: Color(0xFFFFC107),
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     const Expanded(
@@ -447,13 +491,20 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                           ),
                           Text(
                             'Make corrections, adjust scribbles, or add citations',
-                            style: TextStyle(color: Colors.white54, fontSize: 11.5),
+                            style: TextStyle(
+                              color: Colors.white54,
+                              fontSize: 11.5,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white60, size: 20),
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.white60,
+                        size: 20,
+                      ),
                       onPressed: () => Navigator.of(ctx).pop(),
                     ),
                   ],
@@ -492,7 +543,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.input_rounded, color: Colors.black, size: 20),
+                  icon: const Icon(
+                    Icons.input_rounded,
+                    color: Colors.black,
+                    size: 20,
+                  ),
                   label: const Text(
                     'Import into Lesson Composer',
                     style: TextStyle(
@@ -504,7 +559,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFC107),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: () {
                     final finalContent = reviewController.text.trim();
@@ -515,13 +572,19 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         if (_contentController.text.trim().isEmpty) {
                           _contentController.text = finalContent;
                         } else {
-                          _contentController.text = '${_contentController.text.trim()}\n\n$finalContent';
+                          _contentController.text =
+                              '${_contentController.text.trim()}\n\n$finalContent';
                         }
                         if (_titleController.text.trim().isEmpty) {
-                          final match = RegExp(r'^Title:\s*(.+)$', multiLine: true, caseSensitive: false)
-                              .firstMatch(finalContent);
+                          final match = RegExp(
+                            r'^Title:\s*(.+)$',
+                            multiLine: true,
+                            caseSensitive: false,
+                          ).firstMatch(finalContent);
                           if (match != null) {
-                            _titleController.text = match.group(1)?.trim() ?? 'Handwritten Lesson Notes';
+                            _titleController.text =
+                                match.group(1)?.trim() ??
+                                'Handwritten Lesson Notes';
                           } else {
                             _titleController.text = 'Handwritten Lesson Notes';
                           }
@@ -532,7 +595,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Handwritten notes imported into composer & parsed!'),
+                          content: Text(
+                            'Handwritten notes imported into composer & parsed!',
+                          ),
                           backgroundColor: Color(0xFF1E1E1E),
                           duration: Duration(seconds: 2),
                         ),
@@ -553,7 +618,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
     if (content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter some note content or commentary before saving.'),
+          content: Text(
+            'Please enter some note content or commentary before saving.',
+          ),
           backgroundColor: Color(0xFF2A2A2A),
         ),
       );
@@ -575,18 +642,25 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
       }
     }
 
+    final isUpdating = _editingNoteId != null;
     final note = StudyNote(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: _editingNoteId ?? DateTime.now().millisecondsSinceEpoch.toString(),
       title: title,
       content: content,
       parsedReferences: refLabels,
       createdAt: DateTime.now(),
     );
 
-    await StorageService.instance.saveNote(note);
+    if (isUpdating) {
+      await StorageService.instance.updateNote(note);
+    } else {
+      await StorageService.instance.saveNote(note);
+    }
 
     setState(() {
       _isSaving = false;
+      _editingNoteId = null;
+      _editingNoteTitle = null;
       _titleController.clear();
       _contentController.clear();
       _parsedReferences.clear();
@@ -596,7 +670,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Note saved successfully!'),
+          content: Text(
+            isUpdating
+                ? 'Lesson updated successfully'
+                : 'Note saved successfully!',
+          ),
           backgroundColor: const Color(0xFF1E1E1E),
           action: SnackBarAction(
             label: 'VIEW NOTES',
@@ -608,6 +686,105 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
         ),
       );
     }
+  }
+
+  void _startEditingNote(StudyNote note) {
+    _titleController.text = note.title;
+    _contentController.text = note.content;
+    setState(() {
+      _editingNoteId = note.id;
+      _editingNoteTitle = note.title;
+    });
+    _tabController.animateTo(0);
+    _parseScriptures();
+  }
+
+  void _cancelEditingNote() {
+    setState(() {
+      _editingNoteId = null;
+      _editingNoteTitle = null;
+      _titleController.clear();
+      _contentController.clear();
+      _parsedReferences.clear();
+      _hasParsed = false;
+    });
+  }
+
+  Future<void> _promptAppendScripture() async {
+    final quickController = TextEditingController();
+    final citation = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF222222),
+        title: const Text(
+          'Add Scripture Citation',
+          style: TextStyle(
+            color: Color(0xFFE0E0E0),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: TextField(
+          controller: quickController,
+          autofocus: true,
+          style: const TextStyle(color: Color(0xFFE0E0E0)),
+          decoration: InputDecoration(
+            hintText: 'e.g. Hebrews 10:1,4,5,6,7 or John 1:3, 10-14',
+            hintStyle: TextStyle(
+              color: Colors.white.withValues(alpha: 0.35),
+              fontSize: 13,
+            ),
+            filled: true,
+            fillColor: const Color(0xFF1A1A1A),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
+            ),
+          ),
+          onSubmitted: (value) => Navigator.of(ctx).pop(value),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white60),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFC107),
+            ),
+            onPressed: () => Navigator.of(ctx).pop(quickController.text),
+            child: const Text(
+              'Add',
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    quickController.dispose();
+
+    final trimmed = citation?.trim() ?? '';
+    if (trimmed.isEmpty) return;
+
+    final existingNumbers = RegExp(r'^\s*(\d+)\.', multiLine: true)
+        .allMatches(_contentController.text)
+        .map((m) => int.tryParse(m.group(1) ?? '') ?? 0);
+    final nextNumber = existingNumbers.isEmpty
+        ? 1
+        : (existingNumbers.reduce((a, b) => a > b ? a : b) + 1);
+
+    setState(() {
+      final current = _contentController.text;
+      final separator = current.isEmpty || current.endsWith('\n') ? '' : '\n';
+      _contentController.text = '$current$separator\n$nextNumber. $trimmed';
+    });
+
+    _parseScriptures();
   }
 
   @override
@@ -637,7 +814,10 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           indicatorWeight: 3,
           labelColor: const Color(0xFFFFC107),
           unselectedLabelColor: Colors.white60,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+          ),
           tabs: [
             const Tab(text: 'Compose & Parse'),
             Tab(text: 'Saved Notes (${StorageService.instance.notes.length})'),
@@ -646,10 +826,7 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildComposerTab(),
-          _buildSavedNotesTab(),
-        ],
+        children: [_buildComposerTab(), _buildSavedNotesTab()],
       ),
     );
   }
@@ -688,9 +865,16 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         ? const SizedBox(
                             width: 14,
                             height: 14,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFFFC107)),
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Color(0xFFFFC107),
+                            ),
                           )
-                        : const Icon(Icons.document_scanner_outlined, color: Color(0xFFFFC107), size: 16),
+                        : const Icon(
+                            Icons.document_scanner_outlined,
+                            color: Color(0xFFFFC107),
+                            size: 16,
+                          ),
                     label: Text(
                       _isScanningOcr ? 'Scanning...' : 'Scan Handwritten Notes',
                       style: const TextStyle(
@@ -700,15 +884,28 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      side: BorderSide(color: const Color(0xFFFFC107).withValues(alpha: 0.4)),
-                      backgroundColor: const Color(0xFFFFC107).withValues(alpha: 0.08),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      side: BorderSide(
+                        color: const Color(0xFFFFC107).withValues(alpha: 0.4),
+                      ),
+                      backgroundColor: const Color(
+                        0xFFFFC107,
+                      ).withValues(alpha: 0.08),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                     onPressed: _isScanningOcr ? null : _showScanNoteSourceSheet,
                   ),
                   TextButton.icon(
-                    icon: const Icon(Icons.auto_stories, color: Color(0xFFFFC107), size: 16),
+                    icon: const Icon(
+                      Icons.auto_stories,
+                      color: Color(0xFFFFC107),
+                      size: 16,
+                    ),
                     label: const Text(
                       'Insert Template',
                       style: TextStyle(
@@ -718,14 +915,52 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                       ),
                     ),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      backgroundColor: const Color(0xFFFFC107).withValues(alpha: 0.1),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      backgroundColor: const Color(
+                        0xFFFFC107,
+                      ).withValues(alpha: 0.1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: const Color(0xFFFFC107).withValues(alpha: 0.3)),
+                        side: BorderSide(
+                          color: const Color(0xFFFFC107).withValues(alpha: 0.3),
+                        ),
                       ),
                     ),
                     onPressed: _insertLessonTemplate,
+                  ),
+                  TextButton.icon(
+                    icon: const Icon(
+                      Icons.add_link,
+                      color: Color(0xFFFFC107),
+                      size: 16,
+                    ),
+                    label: const Text(
+                      '+ Add Scripture',
+                      style: TextStyle(
+                        color: Color(0xFFFFC107),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      backgroundColor: const Color(
+                        0xFFFFC107,
+                      ).withValues(alpha: 0.1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: const Color(0xFFFFC107).withValues(alpha: 0.3),
+                        ),
+                      ),
+                    ),
+                    onPressed: _promptAppendScripture,
                   ),
                 ],
               ),
@@ -733,16 +968,60 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           ),
           const SizedBox(height: 10),
 
+          // Editing Indicator Banner
+          if (_editingNoteId != null) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFC107).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: const Color(0xFFFFC107).withValues(alpha: 0.4),
+                ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.edit, color: Color(0xFFFFC107), size: 16),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Editing: ${_editingNoteTitle ?? "Untitled Note"}',
+                      style: const TextStyle(
+                        color: Color(0xFFFFC107),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12.5,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+
           // Title Input
           TextField(
             controller: _titleController,
-            style: const TextStyle(color: Color(0xFFE0E0E0), fontSize: 16, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              color: Color(0xFFE0E0E0),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
             decoration: InputDecoration(
-              hintText: 'Note Title (e.g. Solomon\'s Prayer or Ten Commandments)...',
-              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35), fontSize: 14),
+              hintText:
+                  'Note Title (e.g. Solomon\'s Prayer or Ten Commandments)...',
+              hintStyle: TextStyle(
+                color: Colors.white.withValues(alpha: 0.35),
+                fontSize: 14,
+              ),
               filled: true,
               fillColor: const Color(0xFF1E1E1E),
-              prefixIcon: const Icon(Icons.title, color: Color(0xFFFFC107), size: 20),
+              prefixIcon: const Icon(
+                Icons.title,
+                color: Color(0xFFFFC107),
+                size: 20,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(color: Color(0xFF2A2A2A)),
@@ -759,10 +1038,18 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           TextField(
             controller: _contentController,
             maxLines: 7,
-            style: const TextStyle(color: Color(0xFFE0E0E0), fontSize: 15, height: 1.5),
+            style: const TextStyle(
+              color: Color(0xFFE0E0E0),
+              fontSize: 15,
+              height: 1.5,
+            ),
             decoration: InputDecoration(
-              hintText: 'Type your study notes or commentary here...\nInclude citations like:\n- EXODUS 20:1-17\n- 1 KINGS 8:27-30\n- John 3:16\n- 1 John 1:9',
-              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35), fontSize: 13.5),
+              hintText:
+                  'Type your study notes or commentary here...\nInclude citations like:\n- EXODUS 20:1-17\n- 1 KINGS 8:27-30\n- John 3:16\n- 1 John 1:9',
+              hintStyle: TextStyle(
+                color: Colors.white.withValues(alpha: 0.35),
+                fontSize: 13.5,
+              ),
               filled: true,
               fillColor: const Color(0xFF1E1E1E),
               border: OutlineInputBorder(
@@ -783,7 +1070,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
               // Button 1: Parse Scriptures
               Expanded(
                 child: OutlinedButton.icon(
-                  icon: const Icon(Icons.travel_explore, color: Color(0xFFFFC107), size: 20),
+                  icon: const Icon(
+                    Icons.travel_explore,
+                    color: Color(0xFFFFC107),
+                    size: 20,
+                  ),
                   label: const Text(
                     'Parse Scriptures',
                     style: TextStyle(
@@ -793,29 +1084,45 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFFFC107), width: 1.2),
-                    backgroundColor: const Color(0xFFFFC107).withValues(alpha: 0.08),
+                    side: const BorderSide(
+                      color: Color(0xFFFFC107),
+                      width: 1.2,
+                    ),
+                    backgroundColor: const Color(
+                      0xFFFFC107,
+                    ).withValues(alpha: 0.08),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: _parseScriptures,
                 ),
               ),
               const SizedBox(width: 12),
 
-              // Button 2: Save Note
+              // Button 2: Save / Update Note
               Expanded(
                 child: ElevatedButton.icon(
                   icon: _isSaving
                       ? const SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.black,
+                          ),
                         )
-                      : const Icon(Icons.bookmark_add, color: Colors.black, size: 20),
-                  label: const Text(
-                    'Save Note',
-                    style: TextStyle(
+                      : Icon(
+                          _editingNoteId != null
+                              ? Icons.save
+                              : Icons.bookmark_add,
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                  label: Text(
+                    _editingNoteId != null ? 'Update Note' : 'Save Note',
+                    style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
@@ -824,13 +1131,31 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFFFC107),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: _isSaving ? null : _saveCurrentNote,
                 ),
               ),
             ],
           ),
+          if (_editingNoteId != null) ...[
+            const SizedBox(height: 6),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: _isSaving ? null : _cancelEditingNote,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                ),
+                child: const Text(
+                  'Cancel / New Note',
+                  style: TextStyle(color: Colors.white38, fontSize: 12),
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 20),
 
           // Parsed References Preview Section
@@ -856,11 +1181,16 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
             if (_parsedReferences.isNotEmpty)
               Container(
                 margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1E1E1E),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFFC107).withValues(alpha: 0.3)),
+                  border: Border.all(
+                    color: const Color(0xFFFFC107).withValues(alpha: 0.3),
+                  ),
                 ),
                 child: Wrap(
                   alignment: WrapAlignment.spaceEvenly,
@@ -869,52 +1199,105 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                   runSpacing: 8,
                   children: [
                     ElevatedButton.icon(
-                      icon: const Icon(Icons.co_present, color: Colors.black, size: 18),
+                      icon: const Icon(
+                        Icons.co_present,
+                        color: Colors.black,
+                        size: 18,
+                      ),
                       label: const Text(
                         'PODIUM MODE',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12.5),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12.5,
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFFC107),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       onPressed: _launchPodiumModeCurrent,
                     ),
                     OutlinedButton.icon(
-                      icon: const Icon(Icons.menu_book, color: Color(0xFFFFC107), size: 17),
+                      icon: const Icon(
+                        Icons.menu_book,
+                        color: Color(0xFFFFC107),
+                        size: 17,
+                      ),
                       label: const Text(
                         'Syllabus PDF',
-                        style: TextStyle(color: Color(0xFFFFC107), fontWeight: FontWeight.bold, fontSize: 12.5),
+                        style: TextStyle(
+                          color: Color(0xFFFFC107),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12.5,
+                        ),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Color(0xFFFFC107), width: 1),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        side: const BorderSide(
+                          color: Color(0xFFFFC107),
+                          width: 1,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       onPressed: _exportSyllabusPdfCurrent,
                     ),
                     TextButton.icon(
-                      icon: const Icon(Icons.share, color: Color(0xFFFFC107), size: 17),
+                      icon: const Icon(
+                        Icons.share,
+                        color: Color(0xFFFFC107),
+                        size: 17,
+                      ),
                       label: const Text(
                         'Share All',
-                        style: TextStyle(color: Color(0xFFFFC107), fontWeight: FontWeight.bold, fontSize: 12),
+                        style: TextStyle(
+                          color: Color(0xFFFFC107),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                       onPressed: _shareCurrentLesson,
                     ),
                     TextButton.icon(
-                      icon: const Icon(Icons.picture_as_pdf, color: Color(0xFFFFC107), size: 17),
+                      icon: const Icon(
+                        Icons.picture_as_pdf,
+                        color: Color(0xFFFFC107),
+                        size: 17,
+                      ),
                       label: const Text(
                         'PDF',
-                        style: TextStyle(color: Color(0xFFFFC107), fontWeight: FontWeight.bold, fontSize: 12),
+                        style: TextStyle(
+                          color: Color(0xFFFFC107),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                       onPressed: _exportCurrentPdf,
                     ),
                     TextButton.icon(
-                      icon: const Icon(Icons.copy, color: Color(0xFFFFC107), size: 17),
+                      icon: const Icon(
+                        Icons.copy,
+                        color: Color(0xFFFFC107),
+                        size: 17,
+                      ),
                       label: const Text(
                         'Copy',
-                        style: TextStyle(color: Color(0xFFFFC107), fontWeight: FontWeight.bold, fontSize: 12),
+                        style: TextStyle(
+                          color: Color(0xFFFFC107),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                       onPressed: _copyCurrentText,
                     ),
@@ -950,9 +1333,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
     final lessonPlan = _getCurrentLessonPlan();
     final flatList = lessonPlan.allPointsFlat;
     final flatMatch = flatList.cast<FlatLessonPoint?>().firstWhere(
-          (p) => p?.point.rawCitation.toLowerCase().trim() == ref.referenceLabel.toLowerCase().trim(),
-          orElse: () => null,
-        );
+      (p) =>
+          p?.point.rawCitation.toLowerCase().trim() ==
+          ref.referenceLabel.toLowerCase().trim(),
+      orElse: () => null,
+    );
     final point = flatMatch?.point;
     final hasDefs = point != null && point.definitions.isNotEmpty;
     final hasNotes = point != null && point.teacherNotes.isNotEmpty;
@@ -975,7 +1360,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: const Color(0xFF252525),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
               border: Border(
                 bottom: BorderSide(
                   color: const Color(0xFFFFC107).withValues(alpha: 0.2),
@@ -986,7 +1373,10 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFC107),
                     borderRadius: BorderRadius.circular(6),
@@ -1009,21 +1399,39 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                 // Inline Edit Notes Button
                 TextButton.icon(
                   style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                   ),
-                  icon: const Icon(Icons.edit_note, color: Color(0xFFFFC107), size: 16),
+                  icon: const Icon(
+                    Icons.edit_note,
+                    color: Color(0xFFFFC107),
+                    size: 16,
+                  ),
                   label: Text(
                     hasNotes || hasDefs ? 'Edit Notes' : '+ Add Notes',
-                    style: const TextStyle(color: Color(0xFFFFC107), fontSize: 12, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Color(0xFFFFC107),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   onPressed: () => _editNotesForPoint(ref, flatMatch),
                 ),
                 if (widget.onNavigateToScripture != null)
                   TextButton.icon(
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                     ),
-                    icon: const Icon(Icons.open_in_new, color: Color(0xFFFFC107), size: 16),
+                    icon: const Icon(
+                      Icons.open_in_new,
+                      color: Color(0xFFFFC107),
+                      size: 16,
+                    ),
                     label: const Text(
                       'Read',
                       style: TextStyle(color: Color(0xFFFFC107), fontSize: 12),
@@ -1050,22 +1458,38 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                       runSpacing: 4,
                       children: point.definitions.entries.map((e) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFC107).withValues(alpha: 0.15),
+                            color: const Color(
+                              0xFFFFC107,
+                            ).withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(6),
-                            border: Border.all(color: const Color(0xFFFFC107).withValues(alpha: 0.5)),
+                            border: Border.all(
+                              color: const Color(
+                                0xFFFFC107,
+                              ).withValues(alpha: 0.5),
+                            ),
                           ),
                           child: RichText(
                             text: TextSpan(
                               children: [
                                 TextSpan(
                                   text: '${e.key} = ',
-                                  style: const TextStyle(color: Color(0xFFFFC107), fontWeight: FontWeight.bold, fontSize: 12),
+                                  style: const TextStyle(
+                                    color: Color(0xFFFFC107),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
                                 ),
                                 TextSpan(
                                   text: e.value,
-                                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ],
                             ),
@@ -1084,12 +1508,20 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                           children: [
                             const Padding(
                               padding: EdgeInsets.only(top: 5, right: 6),
-                              child: Icon(Icons.circle, color: Color(0xFFFFC107), size: 6),
+                              child: Icon(
+                                Icons.circle,
+                                color: Color(0xFFFFC107),
+                                size: 6,
+                              ),
                             ),
                             Expanded(
                               child: Text(
                                 note,
-                                style: const TextStyle(color: Color(0xFFE0E0E0), fontSize: 13.5, fontStyle: FontStyle.italic),
+                                style: const TextStyle(
+                                  color: Color(0xFFE0E0E0),
+                                  fontSize: 13.5,
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
                             ),
                           ],
@@ -1110,10 +1542,7 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
               children: ref.verses.map((verse) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2),
-                  child: VerseTextWidget(
-                    verse: verse,
-                    fontSize: 14.5,
-                  ),
+                  child: VerseTextWidget(verse: verse, fontSize: 14.5),
                 );
               }).toList(),
             ),
@@ -1123,14 +1552,24 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
     );
   }
 
-  Future<void> _editNotesForPoint(ParsedScriptureRef ref, FlatLessonPoint? flatMatch) async {
+  Future<void> _editNotesForPoint(
+    ParsedScriptureRef ref,
+    FlatLessonPoint? flatMatch,
+  ) async {
     final existingNotes = flatMatch?.point.teacherNotes ?? <String>[];
     final existingDefs = flatMatch?.point.definitions ?? <String, String>{};
 
-    final List<TextEditingController> noteControllers =
-        existingNotes.map((n) => TextEditingController(text: n)).toList();
-    final List<MapEntry<TextEditingController, TextEditingController>> defControllers = existingDefs.entries
-        .map((e) => MapEntry(TextEditingController(text: e.key), TextEditingController(text: e.value)))
+    final List<TextEditingController> noteControllers = existingNotes
+        .map((n) => TextEditingController(text: n))
+        .toList();
+    final List<MapEntry<TextEditingController, TextEditingController>>
+    defControllers = existingDefs.entries
+        .map(
+          (e) => MapEntry(
+            TextEditingController(text: e.key),
+            TextEditingController(text: e.value),
+          ),
+        )
         .toList();
 
     final newNoteController = TextEditingController();
@@ -1164,7 +1603,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.edit_note, color: Color(0xFFFFC107), size: 22),
+                          const Icon(
+                            Icons.edit_note,
+                            color: Color(0xFFFFC107),
+                            size: 22,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -1177,7 +1620,10 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.close, color: Colors.white60),
+                            icon: const Icon(
+                              Icons.close,
+                              color: Colors.white60,
+                            ),
                             onPressed: () => Navigator.of(ctx).pop(),
                           ),
                         ],
@@ -1201,22 +1647,38 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                             children: [
                               const Padding(
                                 padding: EdgeInsets.only(right: 8),
-                                child: Icon(Icons.circle, size: 7, color: Color(0xFFFFC107)),
+                                child: Icon(
+                                  Icons.circle,
+                                  size: 7,
+                                  color: Color(0xFFFFC107),
+                                ),
                               ),
                               Expanded(
                                 child: TextField(
                                   controller: noteControllers[idx],
-                                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
                                   decoration: InputDecoration(
                                     filled: true,
                                     fillColor: const Color(0xFF252525),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
                                   ),
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.redAccent,
+                                  size: 20,
+                                ),
                                 onPressed: () {
                                   setSheetState(() {
                                     noteControllers.removeAt(idx);
@@ -1232,30 +1694,49 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                           Expanded(
                             child: TextField(
                               controller: newNoteController,
-                              style: const TextStyle(color: Colors.white, fontSize: 13.5),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13.5,
+                              ),
                               decoration: const InputDecoration(
                                 hintText: 'Add a talking point...',
-                                hintStyle: TextStyle(color: Colors.white38, fontSize: 13),
+                                hintStyle: TextStyle(
+                                  color: Colors.white38,
+                                  fontSize: 13,
+                                ),
                                 filled: true,
                                 fillColor: Color(0xFF252525),
-                                contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
                                 border: OutlineInputBorder(),
                               ),
                             ),
                           ),
                           const SizedBox(width: 8),
                           ElevatedButton(
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFFC107)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFFFFC107),
+                            ),
                             onPressed: () {
                               final text = newNoteController.text.trim();
                               if (text.isNotEmpty) {
                                 setSheetState(() {
-                                  noteControllers.add(TextEditingController(text: text));
+                                  noteControllers.add(
+                                    TextEditingController(text: text),
+                                  );
                                   newNoteController.clear();
                                 });
                               }
                             },
-                            child: const Text('Add', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                            child: const Text(
+                              'Add',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ],
                       ),
@@ -1279,36 +1760,63 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                                 flex: 2,
                                 child: TextField(
                                   controller: defControllers[dIdx].key,
-                                  style: const TextStyle(color: Color(0xFFFFC107), fontWeight: FontWeight.bold, fontSize: 13),
+                                  style: const TextStyle(
+                                    color: Color(0xFFFFC107),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                  ),
                                   decoration: InputDecoration(
                                     hintText: 'Term',
                                     filled: true,
                                     fillColor: const Color(0xFF252525),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 8,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
                                   ),
                                 ),
                               ),
                               const Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 6),
-                                child: Text('=', style: TextStyle(color: Color(0xFFFFC107), fontWeight: FontWeight.bold)),
+                                child: Text(
+                                  '=',
+                                  style: TextStyle(
+                                    color: Color(0xFFFFC107),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                               Expanded(
                                 flex: 3,
                                 child: TextField(
                                   controller: defControllers[dIdx].value,
-                                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                  ),
                                   decoration: InputDecoration(
                                     hintText: 'Definition',
                                     filled: true,
                                     fillColor: const Color(0xFF252525),
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 8,
+                                    ),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
                                   ),
                                 ),
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.redAccent,
+                                  size: 20,
+                                ),
                                 onPressed: () {
                                   setSheetState(() {
                                     defControllers.removeAt(dIdx);
@@ -1320,11 +1828,23 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         );
                       }),
                       TextButton.icon(
-                        icon: const Icon(Icons.add, color: Color(0xFFFFC107), size: 16),
-                        label: const Text('Add Vocabulary Term', style: TextStyle(color: Color(0xFFFFC107))),
+                        icon: const Icon(
+                          Icons.add,
+                          color: Color(0xFFFFC107),
+                          size: 16,
+                        ),
+                        label: const Text(
+                          'Add Vocabulary Term',
+                          style: TextStyle(color: Color(0xFFFFC107)),
+                        ),
                         onPressed: () {
                           setSheetState(() {
-                            defControllers.add(MapEntry(TextEditingController(), TextEditingController()));
+                            defControllers.add(
+                              MapEntry(
+                                TextEditingController(),
+                                TextEditingController(),
+                              ),
+                            );
                           });
                         },
                       ),
@@ -1333,7 +1853,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFFFC107),
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                         onPressed: () {
                           final updatedNotes = noteControllers
@@ -1350,9 +1872,21 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                           }
 
                           Navigator.of(ctx).pop();
-                          _applyPointEditsToComposer(ref, updatedNotes, updatedDefs, flatMatch);
+                          _applyPointEditsToComposer(
+                            ref,
+                            updatedNotes,
+                            updatedDefs,
+                            flatMatch,
+                          );
                         },
-                        child: const Text('SAVE NOTES & SYNC', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15)),
+                        child: const Text(
+                          'SAVE NOTES & SYNC',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -1387,7 +1921,8 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
     for (final section in currentPlan.sections) {
       final List<LessonPoint> newPoints = [];
       for (final point in section.points) {
-        if (point.rawCitation.toLowerCase().trim() == ref.referenceLabel.toLowerCase().trim()) {
+        if (point.rawCitation.toLowerCase().trim() ==
+            ref.referenceLabel.toLowerCase().trim()) {
           newPoints.add(
             point.copyWith(
               teacherNotes: updatedNotes,
@@ -1399,7 +1934,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           newPoints.add(point);
         }
       }
-      newSections.add(LessonSection(heading: section.heading, points: newPoints));
+      newSections.add(
+        LessonSection(heading: section.heading, points: newPoints),
+      );
     }
 
     if (!foundAndUpdated) {
@@ -1414,7 +1951,12 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
         newSections.add(LessonSection(points: [newPoint]));
       } else {
         final lastSec = newSections.removeLast();
-        newSections.add(LessonSection(heading: lastSec.heading, points: [...lastSec.points, newPoint]));
+        newSections.add(
+          LessonSection(
+            heading: lastSec.heading,
+            points: [...lastSec.points, newPoint],
+          ),
+        );
       }
     }
 
@@ -1453,7 +1995,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.notes, size: 64, color: Colors.white.withValues(alpha: 0.2)),
+            Icon(
+              Icons.notes,
+              size: 64,
+              color: Colors.white.withValues(alpha: 0.2),
+            ),
             const SizedBox(height: 12),
             const Text(
               'No Saved Study Notes Yet',
@@ -1483,7 +2029,10 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
         final resolvedPassages = ScriptureParser.parse(
           '${note.content}\n${note.parsedReferences.join("\n")}',
         );
-        final lessonPlan = LessonParser.parseLessonOutline(note.content, BibleService.instance);
+        final lessonPlan = LessonParser.parseLessonOutline(
+          note.content,
+          BibleService.instance,
+        );
         final bool isLessonPlan = lessonPlan.totalPointsCount > 0;
 
         return Card(
@@ -1496,7 +2045,10 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           child: ExpansionTile(
             shape: const Border(),
             collapsedShape: const Border(),
-            tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            tilePadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
             title: Text(
               note.title,
               style: const TextStyle(
@@ -1510,7 +2062,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
               children: [
                 if (isLessonPlan)
                   IconButton(
-                    icon: const Icon(Icons.co_present, color: Color(0xFFFFC107), size: 22),
+                    icon: const Icon(
+                      Icons.co_present,
+                      color: Color(0xFFFFC107),
+                      size: 22,
+                    ),
                     tooltip: 'Launch Podium Mode',
                     onPressed: () {
                       Navigator.of(context).push(
@@ -1521,7 +2077,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                     },
                   ),
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.share, color: Color(0xFFFFC107), size: 20),
+                  icon: const Icon(
+                    Icons.share,
+                    color: Color(0xFFFFC107),
+                    size: 20,
+                  ),
                   tooltip: 'Export / Share',
                   color: const Color(0xFF252525),
                   onSelected: (action) {
@@ -1543,7 +2103,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         commentary: note.content,
                         sections: resolvedPassages,
                       );
-                      ExportService.shareText(context, title: note.title, text: text);
+                      ExportService.shareText(
+                        context,
+                        title: note.title,
+                        text: text,
+                      );
                     } else if (action == 'pdf') {
                       ExportService.generateAndSharePdf(
                         context: context,
@@ -1568,9 +2132,19 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         value: 'podium',
                         child: Row(
                           children: [
-                            Icon(Icons.co_present, size: 18, color: Color(0xFFFFC107)),
+                            Icon(
+                              Icons.co_present,
+                              size: 18,
+                              color: Color(0xFFFFC107),
+                            ),
                             SizedBox(width: 8),
-                            Text('Podium Mode', style: TextStyle(color: Color(0xFFE0E0E0), fontSize: 13)),
+                            Text(
+                              'Podium Mode',
+                              style: TextStyle(
+                                color: Color(0xFFE0E0E0),
+                                fontSize: 13,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1578,9 +2152,19 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         value: 'syllabus_pdf',
                         child: Row(
                           children: [
-                            Icon(Icons.menu_book, size: 18, color: Color(0xFFFFC107)),
+                            Icon(
+                              Icons.menu_book,
+                              size: 18,
+                              color: Color(0xFFFFC107),
+                            ),
                             SizedBox(width: 8),
-                            Text('Export Syllabus PDF', style: TextStyle(color: Color(0xFFE0E0E0), fontSize: 13)),
+                            Text(
+                              'Export Syllabus PDF',
+                              style: TextStyle(
+                                color: Color(0xFFE0E0E0),
+                                fontSize: 13,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1592,7 +2176,13 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         children: [
                           Icon(Icons.share, size: 18, color: Color(0xFFFFC107)),
                           SizedBox(width: 8),
-                          Text('Share Text', style: TextStyle(color: Color(0xFFE0E0E0), fontSize: 13)),
+                          Text(
+                            'Share Text',
+                            style: TextStyle(
+                              color: Color(0xFFE0E0E0),
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1600,9 +2190,19 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                       value: 'pdf',
                       child: Row(
                         children: [
-                          Icon(Icons.picture_as_pdf, size: 18, color: Color(0xFFFFC107)),
+                          Icon(
+                            Icons.picture_as_pdf,
+                            size: 18,
+                            color: Color(0xFFFFC107),
+                          ),
                           SizedBox(width: 8),
-                          Text('Export PDF', style: TextStyle(color: Color(0xFFE0E0E0), fontSize: 13)),
+                          Text(
+                            'Export PDF',
+                            style: TextStyle(
+                              color: Color(0xFFE0E0E0),
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1612,14 +2212,33 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                         children: [
                           Icon(Icons.copy, size: 18, color: Color(0xFFE0E0E0)),
                           SizedBox(width: 8),
-                          Text('Copy', style: TextStyle(color: Color(0xFFE0E0E0), fontSize: 13)),
+                          Text(
+                            'Copy',
+                            style: TextStyle(
+                              color: Color(0xFFE0E0E0),
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ],
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete_outline, color: Colors.redAccent.shade100, size: 20),
+                  icon: const Icon(
+                    Icons.edit_note,
+                    color: Color(0xFFFFC107),
+                    size: 20,
+                  ),
+                  tooltip: 'Edit Note',
+                  onPressed: () => _startEditingNote(note),
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.delete_outline,
+                    color: Colors.redAccent.shade100,
+                    size: 20,
+                  ),
                   tooltip: 'Delete Note',
                   onPressed: () => _confirmDeleteNote(note),
                 ),
@@ -1633,12 +2252,18 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                   children: [
                     Text(
                       note.formattedDate,
-                      style: const TextStyle(color: Colors.white38, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.white38,
+                        fontSize: 12,
+                      ),
                     ),
                     if (isLessonPlan) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 1.5,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFFC107),
                           borderRadius: BorderRadius.circular(4),
@@ -1663,12 +2288,19 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                     runSpacing: 4,
                     children: note.parsedReferences.map((ref) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFC107).withValues(alpha: 0.15),
+                          color: const Color(
+                            0xFFFFC107,
+                          ).withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(4),
                           border: Border.all(
-                            color: const Color(0xFFFFC107).withValues(alpha: 0.4),
+                            color: const Color(
+                              0xFFFFC107,
+                            ).withValues(alpha: 0.4),
                             width: 0.8,
                           ),
                         ),
@@ -1719,14 +2351,23 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                     ],
 
                     // Top Action Bar (right beneath commentary/reflection and before verses)
-                    _buildSavedNoteActionBar(note, resolvedPassages, lessonPlan: isLessonPlan ? lessonPlan : null, showDelete: false),
+                    _buildSavedNoteActionBar(
+                      note,
+                      resolvedPassages,
+                      lessonPlan: isLessonPlan ? lessonPlan : null,
+                      showDelete: false,
+                    ),
                     const SizedBox(height: 12),
 
                     // Full-Text Scripture Passages
                     if (resolvedPassages.isNotEmpty) ...[
                       Row(
                         children: [
-                          const Icon(Icons.menu_book, color: Color(0xFFFFC107), size: 16),
+                          const Icon(
+                            Icons.menu_book,
+                            color: Color(0xFFFFC107),
+                            size: 16,
+                          ),
                           const SizedBox(width: 6),
                           Text(
                             'SCRIPTURE PASSAGES (${resolvedPassages.length})',
@@ -1754,10 +2395,15 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                             children: [
                               // Passage Header
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
                                 decoration: const BoxDecoration(
                                   color: Color(0xFF2A2A2A),
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(8),
+                                  ),
                                 ),
                                 child: Row(
                                   children: [
@@ -1779,15 +2425,25 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                                           );
                                         },
                                         child: const Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 6,
+                                            vertical: 2,
+                                          ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(Icons.open_in_new, color: Color(0xFFFFC107), size: 14),
+                                              Icon(
+                                                Icons.open_in_new,
+                                                color: Color(0xFFFFC107),
+                                                size: 14,
+                                              ),
                                               SizedBox(width: 4),
                                               Text(
                                                 'Read',
-                                                style: TextStyle(color: Color(0xFFFFC107), fontSize: 11),
+                                                style: TextStyle(
+                                                  color: Color(0xFFFFC107),
+                                                  fontSize: 11,
+                                                ),
                                               ),
                                             ],
                                           ),
@@ -1804,8 +2460,13 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: passage.verses.map((v) {
                                     return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 2),
-                                      child: VerseTextWidget(verse: v, fontSize: 13.5),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 2,
+                                      ),
+                                      child: VerseTextWidget(
+                                        verse: v,
+                                        fontSize: 13.5,
+                                      ),
                                     );
                                   }).toList(),
                                 ),
@@ -1821,7 +2482,12 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
                     const SizedBox(height: 8),
 
                     // Bottom Action Bar with Delete
-                    _buildSavedNoteActionBar(note, resolvedPassages, lessonPlan: isLessonPlan ? lessonPlan : null, showDelete: true),
+                    _buildSavedNoteActionBar(
+                      note,
+                      resolvedPassages,
+                      lessonPlan: isLessonPlan ? lessonPlan : null,
+                      showDelete: true,
+                    ),
                   ],
                 ),
               ),
@@ -1839,7 +2505,10 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
         backgroundColor: const Color(0xFF222222),
         title: const Text(
           'Delete Study Note?',
-          style: TextStyle(color: Color(0xFFE0E0E0), fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Color(0xFFE0E0E0),
+            fontWeight: FontWeight.bold,
+          ),
         ),
         content: const Text(
           'This will permanently remove this note and its attached scriptures.',
@@ -1848,7 +2517,10 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white60)),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white60),
+            ),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -1884,7 +2556,8 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
     LessonPlan? lessonPlan,
     bool showDelete = false,
   }) {
-    final bool hasLessonPlan = lessonPlan != null && lessonPlan.totalPointsCount > 0;
+    final bool hasLessonPlan =
+        lessonPlan != null && lessonPlan.totalPointsCount > 0;
 
     return Wrap(
       alignment: WrapAlignment.end,
@@ -1898,12 +2571,18 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
             icon: const Icon(Icons.co_present, size: 16, color: Colors.black),
             label: const Text(
               'PODIUM MODE',
-              style: TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFFC107),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () {
               Navigator.of(context).push(
@@ -1917,7 +2596,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
         // Export Syllabus PDF
         if (hasLessonPlan)
           OutlinedButton.icon(
-            icon: const Icon(Icons.menu_book, size: 16, color: Color(0xFFFFC107)),
+            icon: const Icon(
+              Icons.menu_book,
+              size: 16,
+              color: Color(0xFFFFC107),
+            ),
             label: const Text(
               'Syllabus PDF',
               style: TextStyle(color: Color(0xFFFFC107), fontSize: 12),
@@ -1925,7 +2608,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFFFFC107), width: 0.9),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () {
               ExportService.exportLessonSyllabusPdf(
@@ -1945,7 +2630,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFFFFC107), width: 0.9),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           onPressed: () {
             final text = ExportService.formatPlainTextLesson(
@@ -1960,7 +2647,11 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
 
         // Export PDF
         OutlinedButton.icon(
-          icon: const Icon(Icons.picture_as_pdf, size: 16, color: Color(0xFFFFC107)),
+          icon: const Icon(
+            Icons.picture_as_pdf,
+            size: 16,
+            color: Color(0xFFFFC107),
+          ),
           label: const Text(
             'Export PDF',
             style: TextStyle(color: Color(0xFFFFC107), fontSize: 12),
@@ -1968,7 +2659,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFFFFC107), width: 0.9),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           onPressed: () {
             ExportService.generateAndSharePdf(
@@ -1991,7 +2684,9 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Colors.white24, width: 0.9),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           onPressed: () {
             final text = ExportService.formatPlainTextLesson(
@@ -2004,9 +2699,30 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
           },
         ),
 
+        // Edit Note
+        OutlinedButton.icon(
+          icon: const Icon(Icons.edit_note, size: 16, color: Color(0xFFFFC107)),
+          label: const Text(
+            'Edit',
+            style: TextStyle(color: Color(0xFFFFC107), fontSize: 12),
+          ),
+          style: OutlinedButton.styleFrom(
+            side: const BorderSide(color: Color(0xFFFFC107), width: 0.9),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          onPressed: () => _startEditingNote(note),
+        ),
+
         if (showDelete)
           IconButton(
-            icon: Icon(Icons.delete_outline, color: Colors.redAccent.shade100, size: 20),
+            icon: Icon(
+              Icons.delete_outline,
+              color: Colors.redAccent.shade100,
+              size: 20,
+            ),
             tooltip: 'Delete Note',
             onPressed: () => _confirmDeleteNote(note),
           ),
