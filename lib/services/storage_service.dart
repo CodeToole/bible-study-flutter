@@ -44,7 +44,8 @@ class StorageService {
     final raw = _prefs?.getString(_highlightsKey);
     if (raw != null && raw.isNotEmpty) {
       try {
-        final Map<String, dynamic> decoded = jsonDecode(raw) as Map<String, dynamic>;
+        final Map<String, dynamic> decoded =
+            jsonDecode(raw) as Map<String, dynamic>;
         for (final entry in decoded.entries) {
           if (entry.value is num) {
             _highlights[entry.key] = (entry.value as num).toInt();
@@ -67,7 +68,8 @@ class StorageService {
     final raw = _prefs?.getString(_questionsKey);
     if (raw != null && raw.isNotEmpty) {
       try {
-        final Map<String, dynamic> decoded = jsonDecode(raw) as Map<String, dynamic>;
+        final Map<String, dynamic> decoded =
+            jsonDecode(raw) as Map<String, dynamic>;
         for (final entry in decoded.entries) {
           _questionAnswers[entry.key] = entry.value.toString();
         }
@@ -84,12 +86,20 @@ class StorageService {
     return value != null ? Color(value) : null;
   }
 
-  Future<void> setHighlight(int book, int chapter, int verse, Color color) async {
+  Future<void> setHighlight(
+    int book,
+    int chapter,
+    int verse,
+    Color color,
+  ) async {
     _highlights[_verseKey(book, chapter, verse)] = color.toARGB32();
     await _saveHighlights();
   }
 
-  Future<void> setHighlightsBatch(List<({int book, int chapter, int verse})> verses, Color color) async {
+  Future<void> setHighlightsBatch(
+    List<({int book, int chapter, int verse})> verses,
+    Color color,
+  ) async {
     final colorInt = color.toARGB32();
     for (final v in verses) {
       _highlights[_verseKey(v.book, v.chapter, v.verse)] = colorInt;
@@ -102,7 +112,9 @@ class StorageService {
     await _saveHighlights();
   }
 
-  Future<void> removeHighlightsBatch(List<({int book, int chapter, int verse})> verses) async {
+  Future<void> removeHighlightsBatch(
+    List<({int book, int chapter, int verse})> verses,
+  ) async {
     for (final v in verses) {
       _highlights.remove(_verseKey(v.book, v.chapter, v.verse));
     }
@@ -127,6 +139,10 @@ class StorageService {
     await _prefs?.setString(_notesKey, StudyNote.encodeList(_notes));
   }
 
+  /// Updates an existing note in-place, keeping its position in the saved list.
+  /// Falls back to inserting it if no note with a matching id is found.
+  Future<void> updateNote(StudyNote note) => saveNote(note);
+
   Future<void> deleteStudyNote(String id) async {
     _notes.removeWhere((n) => n.id == id);
     await _prefs?.setString(_notesKey, StudyNote.encodeList(_notes));
@@ -136,7 +152,8 @@ class StorageService {
 
   // --- Study Questions / Reflection API ---
 
-  String getQuestionAnswer(String questionKey) => _questionAnswers[questionKey] ?? '';
+  String getQuestionAnswer(String questionKey) =>
+      _questionAnswers[questionKey] ?? '';
 
   Future<void> saveQuestionAnswer(String questionKey, String answer) async {
     _questionAnswers[questionKey] = answer;
