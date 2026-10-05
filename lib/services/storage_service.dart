@@ -131,17 +131,52 @@ class StorageService {
 
   Future<void> saveNote(StudyNote note) async {
     final existingIndex = _notes.indexWhere((n) => n.id == note.id);
+    final updatedNotes = List<StudyNote>.from(_notes);
     if (existingIndex >= 0) {
-      _notes[existingIndex] = note;
+      updatedNotes[existingIndex] = note;
     } else {
-      _notes.insert(0, note);
+      updatedNotes.insert(0, note);
     }
-    await _prefs?.setString(_notesKey, StudyNote.encodeList(_notes));
+    await _persistNotes(updatedNotes);
+    _notes
+      ..clear()
+      ..addAll(updatedNotes);
   }
 
-  /// Updates an existing note in-place, keeping its position in the saved list.
-  /// Falls back to inserting it if no note with a matching id is found.
-  Future<void> updateNote(StudyNote note) => saveNote(note);
+  /// Updates an existing note in-place, keeping its position and creation time.
+  Future<void> updateNote(StudyNote note) async {
+    final existingIndex = _notes.indexWhere((saved) => saved.id == note.id);
+    if (existingIndex < 0) {
+      throw ArgumentError.value(
+        note.id,
+        'note.id',
+        'No saved study note exists with this id.',
+      );
+    }
+
+    final existing = _notes[existingIndex];
+    final updatedNotes = List<StudyNote>.from(_notes);
+    updatedNotes[existingIndex] = note.copyWith(
+      createdAt: existing.createdAt,
+      updatedAt: DateTime.now(),
+    );
+    await _persistNotes(updatedNotes);
+    _notes
+      ..clear()
+      ..addAll(updatedNotes);
+  }
+
+  Future<void> _persistNotes(List<StudyNote> notes) async {
+    final prefs = _prefs;
+    if (prefs == null) {
+      throw StateError('StorageService.init() must be called before saving notes.');
+    }
+
+    final saved = await prefs.setString(_notesKey, StudyNote.encodeList(notes));
+    if (!saved) {
+      throw StateError('Failed to persist study notes.');
+    }
+  }
 
   Future<void> deleteStudyNote(String id) async {
     _notes.removeWhere((n) => n.id == id);

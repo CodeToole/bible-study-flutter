@@ -651,23 +651,37 @@ Conclusion: The law of God remains eternal; the animal sacrifices pointed forwar
       createdAt: DateTime.now(),
     );
 
-    if (isUpdating) {
-      await StorageService.instance.updateNote(note);
-    } else {
-      await StorageService.instance.saveNote(note);
+    try {
+      if (isUpdating) {
+        await StorageService.instance.updateNote(note);
+      } else {
+        await StorageService.instance.saveNote(note);
+      }
+    } catch (error) {
+      debugPrint('Error saving study note: $error');
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to save note. Your draft has been preserved.'),
+            backgroundColor: Color(0xFF2A2A2A),
+          ),
+        );
+      }
+      return;
     }
 
-    setState(() {
-      _isSaving = false;
-      _editingNoteId = null;
-      _editingNoteTitle = null;
-      _titleController.clear();
-      _contentController.clear();
-      _parsedReferences.clear();
-      _hasParsed = false;
-    });
-
     if (mounted) {
+      setState(() {
+        _isSaving = false;
+        _editingNoteId = null;
+        _editingNoteTitle = null;
+        _titleController.clear();
+        _contentController.clear();
+        _parsedReferences.clear();
+        _hasParsed = false;
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
