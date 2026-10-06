@@ -5,6 +5,7 @@ import 'models/verse.dart';
 import 'services/bible_service.dart';
 import 'services/storage_service.dart';
 import 'screens/reader_screen.dart';
+import 'screens/sources_screen.dart';
 import 'screens/study_notes_screen.dart';
 
 void main() async {
@@ -198,6 +199,7 @@ class _AppRootContainerState extends State<AppRootContainer> {
             key: _notesKey,
             onNavigateToScripture: _navigateToScripture,
           ),
+          const SourcesScreen(),
         ],
       ),
       bottomNavigationBar: Container(
@@ -222,6 +224,10 @@ class _AppRootContainerState extends State<AppRootContainer> {
             BottomNavigationBarItem(
               icon: Icon(Icons.edit_note_rounded),
               label: 'Study Notes',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.library_books_outlined),
+              label: 'Sources',
             ),
           ],
         ),

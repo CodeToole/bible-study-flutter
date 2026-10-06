@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/source_snippet.dart';
 import '../models/study_note.dart';
 
-/// Manages local persistence for verse highlights, study notes, and study question answers.
+/// Manages local persistence for verse highlights, study notes, study question answers, and source cards.
 class StorageService {
   static final StorageService instance = StorageService._internal();
   StorageService._internal();
@@ -26,17 +27,20 @@ class StorageService {
   static const String _highlightsKey = 'bsa_verse_highlights';
   static const String _notesKey = 'bsa_study_notes';
   static const String _questionsKey = 'bsa_study_questions';
+  static const String _sourcesKey = 'bsa_source_snippets';
 
   // In-memory cache of highlights: "$bookId:$chapter:$verse" -> Color Value (int)
   final Map<String, int> _highlights = {};
   final List<StudyNote> _notes = [];
   final Map<String, String> _questionAnswers = {};
+  final List<SourceSnippet> _sources = [];
 
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     _loadHighlights();
     _loadNotes();
     _loadQuestionAnswers();
+    _loadSources();
   }
 
   void _loadHighlights() {
@@ -74,6 +78,14 @@ class StorageService {
           _questionAnswers[entry.key] = entry.value.toString();
         }
       } catch (_) {}
+    }
+  }
+
+  void _loadSources() {
+    _sources.clear();
+    final raw = _prefs?.getString(_sourcesKey);
+    if (raw != null && raw.isNotEmpty) {
+      _sources.addAll(SourceSnippet.decodeList(raw));
     }
   }
 
@@ -193,5 +205,49 @@ class StorageService {
   Future<void> saveQuestionAnswer(String questionKey, String answer) async {
     _questionAnswers[questionKey] = answer;
     await _prefs?.setString(_questionsKey, jsonEncode(_questionAnswers));
+  }
+
+  // --- Source cards ---
+
+  List<SourceSnippet> get sources => List.unmodifiable(_sources);
+
+  List<SourceSnippet> sourcesForVerse(String verseKey) {
+    final needle = verseKey.trim().toLowerCase();
+    return _sources
+        .where(
+          (source) => source.verseKeys.any(
+            (key) => key.trim().toLowerCase() == needle,
+          ),
+        )
+        .toList();
+  }
+
+  Future<void> saveSource(SourceSnippet source) async {
+    final existingIndex = _sources.indexWhere((item) => item.id == source.id);
+    if (existingIndex >= 0) {
+      _sources[existingIndex] = source;
+    } else {
+      _sources.insert(0, source);
+    }
+    await _persistSources();
+  }
+
+  Future<void> deleteSource(String id) async {
+    _sources.removeWhere((source) => source.id == id);
+    await _persistSources();
+  }
+
+  Future<void> _persistSources() async {
+    final prefs = _prefs;
+    if (prefs == null) {
+      throw StateError('StorageService.init() must be called before saving sources.');
+    }
+    final saved = await prefs.setString(
+      _sourcesKey,
+      SourceSnippet.encodeList(_sources),
+    );
+    if (!saved) {
+      throw StateError('Failed to persist source cards.');
+    }
   }
 }
